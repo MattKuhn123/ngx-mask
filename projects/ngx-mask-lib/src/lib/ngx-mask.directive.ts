@@ -967,6 +967,11 @@ export class NgxMaskDirective implements ControlValueAccessor, OnChanges, Valida
             this._inputValue = inputValue;
             this._setMask();
 
+            const checkForEmptyString = this._maskService.applyMask(
+                inputValue,
+                this._maskService.maskExpression
+            );
+
             if (
                 (inputValue && this._maskService.maskExpression) ||
                 (this._maskService.maskExpression &&
@@ -977,10 +982,15 @@ export class NgxMaskDirective implements ControlValueAccessor, OnChanges, Valida
                     ? (this._maskService.writingValue = true)
                     : '';
 
-                this._maskService.formElementProperty = [
-                    'value',
-                    this._maskService.applyMask(inputValue, this._maskService.maskExpression),
-                ];
+                if (!checkForEmptyString && !this._maskService.maskChanged) {
+                    console.log(this._maskService.maskChanged);
+                    this.onChange('');
+                } else {
+                    this._maskService.formElementProperty = [
+                        'value',
+                        this._maskService.applyMask(inputValue, this._maskService.maskExpression),
+                    ];
+                }
                 // Let the service know we've finished writing value
                 typeof this.inputTransformFn !== 'function'
                     ? (this._maskService.writingValue = false)

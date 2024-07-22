@@ -1,6 +1,6 @@
 import { Component, effect, ElementRef, inject, input, viewChildren } from '@angular/core';
 import { JsonPipe, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { HighlightModule } from 'ngx-highlightjs';
 import { IComDoc, IMaskOptions, TExample } from '@open-source/accordion/content.interfaces';
@@ -50,10 +50,29 @@ export class OptionsComponent {
 
     public readonly activeCardId = toSignal(this.scrollService.activeCard$);
 
+    public formGroup!: FormGroup;
+    public emittedValue = '';
+
     public constructor() {
         effect(() => {
             this.scrollService.onScroll(this.cards());
             this.accordionService.onChangeAccordion(this.cards());
         });
+        this.formGroup = new FormGroup({
+            inputFormControl: new FormControl(''),
+        });
+
+        this.formGroup.controls['inputFormControl']?.valueChanges.subscribe((data: string) => {
+            console.log('valueChanges', data);
+            this.emittedValue = data;
+        });
+    }
+
+    onClick(): void {
+        this.formGroup.controls['inputFormControl']?.setValue('978-1-93624-386-0');
+    }
+
+    getFormControl(): FormControl {
+        return this.formGroup.controls['inputFormControl'] as FormControl;
     }
 }
